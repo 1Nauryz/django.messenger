@@ -5,12 +5,20 @@ from .models import *
 
 def index(request):
     message = Message.objects.all()
-    return render(request, 'network/index.html', {'message': message, 'title': 'Main Page'})
+    context = {
+        'message': message,
+        'title': 'Main Page',
+    }
+    return render(request, 'network/index.html', context=context)
 
 
 def about(request):
     message = Message.objects.all()
-    return render(request, 'network/about.html', {'message': message, 'title': 'About Page'})
+    context = {
+        'message': message,
+        'title': 'About Page',
+    }
+    return render(request, 'network/about.html', context=context)
 
 
 def login(request):
@@ -18,7 +26,12 @@ def login(request):
 
 
 def contact(request):
-    return HttpResponse("CONTACT PAGE")
+    message = Message.objects.all()
+    context = {
+        'message': message,
+        'title': 'Contact Page',
+    }
+    return render(request, 'network/contact.html', context=context)
 
 
 def writeMessage(request):
