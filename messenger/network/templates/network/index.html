@@ -1,32 +1,35 @@
 {% extends 'network/base.html' %}
 
 {% block mainmenu %}
-<div class="container">
-        <div class="row">
-            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
-                <div class="post-preview">
-                        {% for m in message %}
-                        <h2 class="post-title">
-                            {{m.fromWhom}}
-                        </h2>
-                        <h3 class="post-subtitle">
-                            {{m.content}}
-                        </h3>
-                    <p class="post-meta">{{m.toWhom}} <a href="#">Start Bootstrap</a> on September 24, 2014</p>
-                </div>
-                <hr>
-                {% endfor %}
-                <!-- Pager -->
-                <ul class="pager">
-                    <li class="next">
-                        <a href="#">Older Posts &rarr;</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
+<div class="post-card" style="margin: auto; text-align: center">
+    {% for m in message %}
+    <div class="photo-pos">
+        <h2 class="post-title">
+            <a href="{{m.get_absolute_url}}">{{m.fromWhom}}</a>
+        </h2>
+        {% if m.photo %}
+        <img src="{{m.photo.url}}" alt="" class="img-article-left" width="500px" height="300px">
+        {% endif %}
     </div>
-<hr>
+    <div class="post-info" style="margin-top: 20px">
+        <b>Category: {{m.cat}}</b><br>
+        <i style="font-size: 20px">{{m.content}}</i>
+        <p class="post-meta">{{m.toWhom}} <a href="#">Posted</a> on {{m.time_create}}</p>
+    </div>
+    <hr>
+    {% endfor %}
+</div>
+
 <footer>
+    <div class="pagi" style="text-align: center; margin: auto">
+        <nav class="navbar navbar-light bg-light">
+            {% for p in page_obj.paginator.page_range %}
+                <div class="navbar-brand navbar-right" >
+                    <a href="?page={{ p }}">{{ p }}</a>
+                </div>
+            {% endfor %}
+        </nav>
+    </div>
         <div class="container">
             <div class="row">
                 <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
@@ -56,10 +59,39 @@
                             </a>
                         </li>
                     </ul>
-                    <p class="copyright text-muted">Facebook © 2023 Powered by WordPress VIP</p>
+                    <p class="copyright text-muted" style="margin: auto; text-align: center">Facebook © 2023 Powered by WordPress VIP</p>
                 </div>
             </div>
         </div>
     </footer>
 
 {% endblock mainmenu %}
+<!--<div class="container">-->
+<!--        <div class="row">-->
+<!--            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">-->
+<!--                <div class="post-preview">-->
+<!--                        {% for m in message %}-->
+<!--                    <p class="first">Category: {{m.cat}}</p>-->
+<!--                        <h2 class="post-title">-->
+<!--                            <a href="{{m.get_absolute_url}}">{{m.fromWhom}}</a>-->
+<!--                        </h2>-->
+<!--                        <h3 class="post-subtitle">-->
+<!--                            {% if m.photo %}-->
+<!--                            <img src="{{m.photo.url}}" alt="" class="img-article-left" width="500px" height="300px">-->
+<!--                            {% endif %}-->
+<!--                            <br><br>-->
+<!--                            {{m.content}}-->
+<!--                        </h3>-->
+<!--                    <p class="post-meta">{{m.toWhom}} <a href="#">Posted</a> on {{m.time_create}}</p>-->
+<!--                </div>-->
+<!--                <hr>-->
+<!--                {% endfor %}-->
+<!--                &lt;!&ndash; Pager &ndash;&gt;-->
+<!--&lt;!&ndash;                <ul class="pager">&ndash;&gt;-->
+<!--&lt;!&ndash;                    <li class="next">&ndash;&gt;-->
+<!--&lt;!&ndash;                        <a href="#">Older Posts &rarr;</a>&ndash;&gt;-->
+<!--&lt;!&ndash;                    </li>&ndash;&gt;-->
+<!--&lt;!&ndash;                </ul>&ndash;&gt;-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->

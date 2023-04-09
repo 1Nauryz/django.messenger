@@ -1,0 +1,12 @@
+{% for c in cats %}
+    {% if c.pk == cat_selected %}
+        <div class="navbar-brand" class="selected">
+            {{ c.name }}
+        </div>
+    {% else %}
+        <div>
+            <a class="navbar-brand" href="{{ c.get_absolute_url }}">{{ c.name }}</a>
+        </div>
+    {% endif %}
+    </ul>
+{% endfor %}

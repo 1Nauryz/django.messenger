@@ -1,0 +1,13 @@
+{% extends 'network/base.html' %}
+
+{% block mainmenu %}
+<h1>{{ title }}</h1>
+<div class="registerForm" style="margin-top: 50px; margin-left: 50px; font-family: Tahoma; font-size: 18px">
+    <form method="post" style="margin: 10px">
+        {% csrf_token %}
+        {{ form.as_p}}
+        <button type="submit">Register</button>
+    </form>
+</div>
+
+{% endblock %}

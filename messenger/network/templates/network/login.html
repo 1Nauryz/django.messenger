@@ -1,0 +1,13 @@
+{% extends 'network/base.html' %}
+
+{% block mainmenu %}
+<h1>{{ title }}</h1>
+<div class="loginForm" style="margin-top: 50px; margin-left: 50px; font-family: Tahoma; font-size: 18px">
+    <form method="post" style="margin: 10px">
+        {% csrf_token %}
+        {{ form.as_p}}
+        <button type="submit">Log in</button>
+    </form>
+</div>
+
+{% endblock %}

@@ -1,4 +1,5 @@
 {% load static %}
+{% load network_tags %}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -61,12 +62,21 @@
                     <li>
                         <a href="{% url 'contact' %}">Contact</a>
                     </li>
+                    {% if request.user.is_authenticated %}
+                        <li>
+                            <a href="#">{{user.username}}</a>
+                        </li>
+                        <li>
+                            <a href="{% url 'logout' %}">Log out</a>
+                        </li>
+                    {% else %}
                      <li>
                         <a href="{% url 'login' %}">Log in</a>
                     </li>
                      <li>
-                        <a href="#">Register</a>
+                        <a href="{% url 'register' %}">Register</a>
                     </li>
+                    {% endif %}
                 </ul>
             </div>
             <!-- /.navbar-collapse -->
@@ -77,8 +87,38 @@
     <!-- Page Header -->
     <!-- Set your background image for this header on the line below. -->
     <header class="intro-header" style="background-image: url('../../static/network/images/headerimg.webp'); margin-top: 100px; height: 300px">
-
     </header>
+    <nav class="navbar navbar-light bg-light">
+        <a class="navbar-brand" href="{% url 'writeMessage' %}">Create Post</a>
+        {% if cat_selected == 0 %}
+                    <div class="navbar-brand" class="selected">
+                        All Posts
+                    </div>
+                    {% else %}
+                        <a class="navbar-brand" href="{% url 'home' %}">All Posts</a>
+                    {% endif %}
+
+        {% for c in cats %}
+        {% if c.message__count > 0 %}
+            {% if c.pk == cat_selected %}
+                <div class="navbar-brand" class="selected">{{c.name}}</div>
+            {% else %}
+                <div class="navbar-brand"><a href="{{ c.get_absolute_url }}">{{ c.name }}</a></div>
+            {% endif %}
+        {% endif %}
+        {% endfor %}
+        {% for p in page_obj.paginator.page_range %}
+            {% if page_obj.number == p %}
+                <div class="navbar-brand navbar-right selected"  style="margin-right: 25px;">
+                    <a href="?page={{ p }}">{{ p }}</a>
+                </div>
+            {% else %}
+                <div class="navbar-brand navbar-right"  style="margin-right: 25px">
+                    <a href="?page={{ p }}">{{ p }}</a>
+                </div>
+            {% endif %}
+            {% endfor %}
+    </nav>
     {% block mainmenu %}
     <!-- Main Content -->
     {% endblock mainmenu%}

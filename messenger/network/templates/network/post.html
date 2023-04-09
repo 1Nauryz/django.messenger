@@ -1,0 +1,18 @@
+{% extends 'network/base.html' %}
+
+{% block mainmenu %}
+<div class="aboutPost" style="margin-left: 100px; margin-top: 50px">
+    <h1>{{post.fromWhom}}</h1>
+
+    {% if post.photo %}
+    <p><img src="{{post.photo.url}}" alt="" class="img-article-left" width="800px" height="500px"></p>
+    {% endif %}
+
+    <div class="post-content" style="">
+        <h3>
+            {{post.content|linebreaks}}
+        </h3>
+    </div>
+
+</div>
+{% endblock %}
