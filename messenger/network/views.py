@@ -8,9 +8,12 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from .forms import *
 from .models import *
+from .serializers import MessageSerializer
 from .utils import *
 
 
@@ -161,15 +164,37 @@ def logout_user(request):
     logout(request)
     return redirect('login')
 
-# def show_category(request, cat_id):
-#     message = Message.objects.filter(cat_id=cat_id)
-#
-#     if len(message) == 0:
-#         return Http404()
-#
-#     context = {
-#         'message': message,
-#         'cat_selected': cat_id,
-#         'title': 'Category Page',
-#     }
-#     return render(request, 'network/index.html', context=context)
+
+class MessageAPIView(APIView):
+    def get(self, request):
+        m = Message.objects.all()
+        return Response({'Message': MessageSerializer(m, many=True).data})
+
+    def post(self, request):
+        serializer = MessageSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response({'post': serializer.data})
+
+    def put(self, request, *args, **kwargs):
+        pk = kwargs.get("pk", None)
+        if not pk:
+            return Response({"error": "Method PUT not allowed"})
+
+        try:
+            instance = Message.objects.get(pk=pk)
+        except:
+            return Response({"error": "Object does not exists"})
+
+        serializers = MessageSerializer(data=request.data, instance=instance)
+        serializers.is_valid(raise_exception=True)
+        serializers.save()
+        return Response({"post":serializers.data})
+
+    def delete(self, request, *args, **kwargs):
+        pk = kwargs.get("pk", None)
+        if not pk:
+            return Response({"error": "Method DELETE not allowed"})
+
+        return Response({"post": "delete post " + str(pk)})

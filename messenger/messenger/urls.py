@@ -25,6 +25,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('captcha/', include('captcha.urls')),
     path('', include('network.urls')),
+    path('api/v1/messages/', MessageAPIView.as_view()),
+    path('api/v1/messages/<int:pk>/', MessageAPIView.as_view())
 ]
 
 if settings.DEBUG:

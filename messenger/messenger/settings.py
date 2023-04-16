@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'debug_toolbar',
     'captcha',
     'network.apps.NetworkConfig',
+    'rest_framework',
 
 ]
 
