@@ -2,6 +2,7 @@ from django.contrib import admin
 
 from .models import *
 
+
 class MessageAdmin(admin.ModelAdmin):
     list_display = ['id', 'toWhom', 'fromWhom', 'photo', 'time_create', 'is_published']
     prepopulated_fields = {"slug": ("fromWhom",)}

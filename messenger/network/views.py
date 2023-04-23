@@ -8,11 +8,15 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from rest_framework import generics, viewsets, routers
+from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .forms import *
 from .models import *
+from .permissions import IsOwnerOrReadOnly
 from .serializers import MessageSerializer
 from .utils import *
 
@@ -28,6 +32,7 @@ class MessageHome(DataMixin, ListView):
         context = super().get_context_data(**kwargs)
         c_def = self.get_user_context(title='Main Page')
         return dict(list(context.items()) + list(c_def.items()))
+
     def get_queryset(self):
         return Message.objects.filter(is_published=True)
 
@@ -114,6 +119,7 @@ class ShowPost(DataMixin, DetailView):
 #
 #     return render(request, 'network/post.html', context=context)
 
+
 class MessageCategory(DataMixin, ListView):
     paginate_by = 3
     model = Message
@@ -130,6 +136,7 @@ class MessageCategory(DataMixin, ListView):
             title='Category - ' + str(context['message'][0].cat),
             cat_selected=context['message'][0].cat_id)
         return dict(list(context.items()) + list(c_def.items()))
+
 
 class RegisterUser(DataMixin, CreateView):
     form_class = UserCreationForm
@@ -165,36 +172,30 @@ def logout_user(request):
     return redirect('login')
 
 
-class MessageAPIView(APIView):
-    def get(self, request):
-        m = Message.objects.all()
-        return Response({'Message': MessageSerializer(m, many=True).data})
+# class MessageViewSet(viewsets.ModelViewSet):
+#     queryset = Message.objects.all()
+#     serializer_class = MessageSerializer
+#
+#     @action(methods=['get'], detail=False)
+#     def category(self, request, pk=None):
+#         cats = Category.objects.all()
+#         return Response({'cats': [c.name for c in cats]})
 
-    def post(self, request):
-        serializer = MessageSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
+class MessageAPIList(generics.ListCreateAPIView):
+    queryset = Message.objects.all()
+    serializer_class = MessageSerializer
+    permission_classes = (IsAuthenticatedOrReadOnly, )
 
-        return Response({'post': serializer.data})
 
-    def put(self, request, *args, **kwargs):
-        pk = kwargs.get("pk", None)
-        if not pk:
-            return Response({"error": "Method PUT not allowed"})
+class MessageAPIUpdate(generics.RetrieveUpdateAPIView):
+    queryset = Message.objects.all()
+    serializer_class = MessageSerializer
+    permission_classes = (IsOwnerOrReadOnly, )
 
-        try:
-            instance = Message.objects.get(pk=pk)
-        except:
-            return Response({"error": "Object does not exists"})
 
-        serializers = MessageSerializer(data=request.data, instance=instance)
-        serializers.is_valid(raise_exception=True)
-        serializers.save()
-        return Response({"post":serializers.data})
+class MessageAPIDestroy(generics.RetrieveDestroyAPIView):
+    queryset = Message.objects.all()
+    serializer_class = MessageSerializer
+    permission_classes = (IsAdminUser, )
 
-    def delete(self, request, *args, **kwargs):
-        pk = kwargs.get("pk", None)
-        if not pk:
-            return Response({"error": "Method DELETE not allowed"})
 
-        return Response({"post": "delete post " + str(pk)})

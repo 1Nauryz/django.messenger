@@ -5,12 +5,12 @@ from captcha.fields import CaptchaField
 
 from .models import *
 
+
 class AddPostForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['cat'].empty_label = "Category not selected"
-
 
     class Meta:
         model = Message
@@ -20,10 +20,8 @@ class AddPostForm(forms.ModelForm):
         }
         captcha = CaptchaField()
 
-
     def clean_content(self):
         content = self.cleaned_data['content']
         if len(content) < 20:
             raise ValidationError('Minimum content length 20 characters')
-
         return content
