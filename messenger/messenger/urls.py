@@ -16,6 +16,7 @@ Including another URLconf
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path
+from rest_framework_simplejwt.views import TokenVerifyView, TokenRefreshView, TokenObtainPairView
 
 from messenger import settings
 from network.views import *
@@ -23,27 +24,26 @@ from django.urls import path, include
 from rest_framework import routers
 
 
-# class MyCustomRouter(routers.SimpleRouter):
-#     routes = [
-#         routers.Route(
-#             url=r'^{prefix}$',
-#             mapping={'get': 'list'},
-#             name='{basename}-list',
-#             detail=False,
-#             initkwargs={'suffix': 'List'}
-#         ),
-#         routers.Route(
-#             url=r'^{prefix}/{lookup}$',
-#             mapping={'get': 'retrieve'},
-#             name='{basename}-detail',
-#             detail=True,
-#             initkwargs={'suffix': 'Detail'}
-#         ),
-#     ]
-#
-#
-# router = MyCustomRouter()
-# router.register(r'message', MessageViewSet)
+class MyCustomRouter(routers.SimpleRouter):
+    routes = [
+        routers.Route(
+            url=r'^{prefix}$',
+            mapping={'get': 'list'},
+            name='{basename}-list',
+            detail=False,
+            initkwargs={'suffix': 'List'}
+        ),
+        routers.Route(
+            url=r'^{prefix}/{lookup}$',
+            mapping={'get': 'retrieve'},
+            name='{basename}-detail',
+            detail=True,
+            initkwargs={'suffix': 'Detail'}
+        ),
+    ]
+
+
+router = MyCustomRouter()
 
 
 urlpatterns = [
@@ -53,6 +53,9 @@ urlpatterns = [
     path('api/v1/message/', MessageAPIList.as_view()),
     path('api/v1/message/<int:pk>/', MessageAPIUpdate.as_view()),
     path('api/v1/messagedelete/<int:pk>', MessageAPIDestroy.as_view()),
+    path('api/v1/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/v1/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('api/v1/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
     # path('api/v1/', include(router.urls))
     # path('api/v1/messageslist/', MessageViewSet.as_view({'get': 'list'})),
     # path('api/v1/messageslist/<int:pk>/', MessageViewSet.as_view({'put': 'update'})),

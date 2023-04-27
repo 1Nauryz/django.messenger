@@ -6,8 +6,8 @@ from django.core.paginator import Paginator
 from django.http import HttpResponse, HttpResponseNotFound, Http404
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
-from django.views.generic import ListView, DetailView, CreateView
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic import ListView, DetailView, CreateView, UpdateView
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from rest_framework import generics, viewsets, routers
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAdminUser
@@ -81,6 +81,22 @@ class writeMessage(LoginRequiredMixin, DataMixin, CreateView):
         c_def = self.get_user_context(title='Create Page')
         return dict(list(context.items()) + list(c_def.items()))
 
+
+class MessageUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = Message
+    template_name = 'network/post_form.html'
+    fields = ['title', 'content', 'file']
+
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        return super().form_valid(form)
+
+    def test_func(self):
+        post = self.get_object()
+        if self.request.user == post.author:
+            return True
+        return False
+
 # def writeMessage(request):
 #     if request.method == 'POST':
 #         form = AddPostForm(request.POST, request.FILES)
@@ -107,17 +123,6 @@ class ShowPost(DataMixin, DetailView):
         context = super().get_context_data(**kwargs)
         c_def = self.get_user_context(title='Post Page')
         return dict(list(context.items()) + list(c_def.items()))
-
-# def show_post(request, post_slug):
-#     post = get_object_or_404(Message, slug=post_slug)
-#
-#     context = {
-#         'post': post,
-#         'fromWhom': post.fromWhom,
-#         'cat_selected': post.cat_id,
-#     }
-#
-#     return render(request, 'network/post.html', context=context)
 
 
 class MessageCategory(DataMixin, ListView):
@@ -172,15 +177,6 @@ def logout_user(request):
     return redirect('login')
 
 
-# class MessageViewSet(viewsets.ModelViewSet):
-#     queryset = Message.objects.all()
-#     serializer_class = MessageSerializer
-#
-#     @action(methods=['get'], detail=False)
-#     def category(self, request, pk=None):
-#         cats = Category.objects.all()
-#         return Response({'cats': [c.name for c in cats]})
-
 class MessageAPIList(generics.ListCreateAPIView):
     queryset = Message.objects.all()
     serializer_class = MessageSerializer
@@ -191,6 +187,7 @@ class MessageAPIUpdate(generics.RetrieveUpdateAPIView):
     queryset = Message.objects.all()
     serializer_class = MessageSerializer
     permission_classes = (IsOwnerOrReadOnly, )
+    # authentication_classes = (TokenAuthentication, )
 
 
 class MessageAPIDestroy(generics.RetrieveDestroyAPIView):
